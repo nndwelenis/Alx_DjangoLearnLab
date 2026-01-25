@@ -17,3 +17,31 @@ User groups were created using the Django admin interface:
 - Admins: all permissions
 
 Views are protected using Django's permission_required decorator.
+
+## Security Best Practices Implemented
+
+The following security measures were implemented in this Django project:
+
+### Secure Settings
+- DEBUG is set to False to prevent sensitive information leakage.
+- Browser security headers are enabled to mitigate XSS and clickjacking:
+  - SECURE_BROWSER_XSS_FILTER
+  - SECURE_CONTENT_TYPE_NOSNIFF
+  - X_FRAME_OPTIONS
+- CSRF and session cookies are secured to HTTPS only.
+
+### CSRF Protection
+- All HTML forms include Django's {% csrf_token %} tag to protect against CSRF attacks.
+
+### Secure Data Access
+- Django ORM is used for all database queries to prevent SQL injection.
+- User input is validated and sanitized using Django ModelForms.
+
+### Content Security Policy
+- A Content Security Policy (CSP) header is added via custom middleware.
+- The policy restricts content loading to same-origin sources only.
+
+### Testing
+- Permissions and access controls were tested manually by assigning users to groups.
+- Forms were tested to ensure CSRF protection is enforced.
+- Views were verified to handle user input securely.

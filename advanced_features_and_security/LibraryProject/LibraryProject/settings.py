@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-sgzkk(+7r@$z+jaoj4r8f^r4sf88&f1d97cox$jucjs(^$1b(('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -48,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'LibraryProject.settings.ContentSecurityPolicyMiddleware'
 ]
 
 ROOT_URLCONF = 'LibraryProject.urls'
@@ -119,3 +120,18 @@ STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = "bookshelf.CustomUser"
 
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+class ContentSecurityPolicyMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        response["Content-Security-Policy"] = "default-src 'self'"
+        return response
