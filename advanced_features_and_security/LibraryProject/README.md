@@ -45,3 +45,30 @@ The following security measures were implemented in this Django project:
 - Permissions and access controls were tested manually by assigning users to groups.
 - Forms were tested to ensure CSRF protection is enforced.
 - Views were verified to handle user input securely.
+
+
+## HTTPS and Secure Redirect Configuration
+
+This project is configured to enforce HTTPS and apply secure communication best practices.
+
+### HTTPS Enforcement
+- All HTTP requests are redirected to HTTPS using `SECURE_SSL_REDIRECT`.
+- HTTP Strict Transport Security (HSTS) is enabled with a duration of one year.
+- Subdomains are included in the HSTS policy, and preload support is enabled.
+
+### Secure Cookies
+- Session cookies are restricted to HTTPS connections only.
+- CSRF cookies are restricted to HTTPS connections only.
+
+### Secure HTTP Headers
+- Clickjacking protection is enforced using `X_FRAME_OPTIONS = "DENY"`.
+- MIME type sniffing is disabled to prevent content-type attacks.
+- Browser XSS filtering is enabled.
+
+### Deployment Notes
+In a production environment, HTTPS must be enabled at the web server level using valid SSL/TLS certificates.
+This can be achieved using servers such as Nginx or Apache configured with certificate files provided by a trusted certificate authority.
+
+### Security Review
+These settings ensure that all communication between clients and the server is encrypted, cookies are protected, and common web-based attacks are mitigated.
+Further improvements may include automated certificate renewal and additional monitoring.

@@ -135,3 +135,24 @@ class ContentSecurityPolicyMiddleware:
         response = self.get_response(request)
         response["Content-Security-Policy"] = "default-src 'self'"
         return response
+
+# HTTPS enforcement settings
+
+SECURE_SSL_REDIRECT = True
+
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+
+# Secure cookie settings
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+
+# Security headers
+
+X_FRAME_OPTIONS = "DENY"
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
