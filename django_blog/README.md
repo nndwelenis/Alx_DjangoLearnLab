@@ -485,3 +485,182 @@ The blog post management system:
 * Uses Django best practices for redirection and validation.
 
 
+
+# Comment System
+
+## Overview
+
+The Django Blog project includes a fully functional comment system that allows users to interact with blog posts. Users can:
+
+* View comments under each blog post
+* Add new comments (authenticated users only)
+* Edit their own comments
+* Delete their own comments
+
+The system is implemented using Django’s `ModelForm` and class-based generic views with proper permission enforcement.
+
+---
+
+## Comment Model
+
+The `Comment` model is defined in `blog/models.py`.
+
+Fields:
+
+* `post` – ForeignKey to `Post`
+* `author` – ForeignKey to `User`
+* `content` – TextField
+* `created_at` – DateTimeField (auto_now_add=True)
+* `updated_at` – DateTimeField (auto_now=True)
+
+Example:
+
+```python
+class Comment(models.Model):
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+```
+
+### Relationship
+
+* A post can have multiple comments.
+* If a post is deleted, all associated comments are deleted automatically.
+* Comments are accessed using:
+
+```python
+post.comments.all()
+```
+
+---
+
+## Adding a Comment
+
+URL pattern:
+
+```
+/posts/<post_id>/comments/new/
+```
+
+Rules:
+
+* User must be logged in.
+* The `post` is determined from the URL.
+* The `author` is automatically assigned as the logged-in user.
+* Users cannot manually assign the author or post.
+
+After submission, the user is redirected to the related post detail page.
+
+Security:
+
+* Protected using `LoginRequiredMixin`
+* CSRF protection enabled
+* Server-side assignment of post and author
+
+---
+
+## Editing a Comment
+
+URL pattern:
+
+```
+/comments/<comment_id>/update/
+```
+
+Rules:
+
+* Only the original comment author can edit the comment.
+* Enforced using `UserPassesTestMixin`.
+
+Authorization check:
+
+```python
+def test_func(self):
+    comment = self.get_object()
+    return self.request.user == comment.author
+```
+
+If another user attempts to edit the comment, Django returns a 403 Forbidden response.
+
+---
+
+## Deleting a Comment
+
+URL pattern:
+
+```
+/comments/<comment_id>/delete/
+```
+
+Rules:
+
+* Only the comment author can delete the comment.
+* A confirmation page is displayed before deletion.
+* Protected using:
+
+  * `LoginRequiredMixin`
+  * `UserPassesTestMixin`
+
+After deletion, the user is redirected back to the associated post.
+
+---
+
+## Displaying Comments
+
+Comments are displayed on the post detail page.
+
+Each comment shows:
+
+* Content
+* Author username
+* Creation date
+
+Edit and Delete links are shown only if:
+
+```python
+user == comment.author
+```
+
+If no comments exist, the page displays:
+
+```
+No comments yet.
+```
+
+---
+
+## Permission Summary
+
+| Action         | Login Required | Author Only |
+| -------------- | -------------- | ----------- |
+| View comments  | No             | No          |
+| Add comment    | Yes            | No          |
+| Edit comment   | Yes            | Yes         |
+| Delete comment | Yes            | Yes         |
+
+---
+
+## Testing Instructions
+
+To test the comment system:
+
+1. Log in as a user.
+2. Open a blog post.
+3. Add a comment.
+4. Confirm it appears under the post.
+5. Edit the comment and confirm changes.
+6. Delete the comment and confirm removal.
+7. Log out and verify:
+
+   * You cannot add comments.
+   * Edit/Delete options are hidden.
+8. Log in as another user and verify:
+
+   * You cannot edit or delete someone else's comment.
+
