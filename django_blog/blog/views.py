@@ -26,6 +26,10 @@ from .forms import CommentForm
 from django.db.models import Q
 from .models import Tag
 
+
+from django.views.generic import ListView
+from taggit.models import Tag
+
 # Create your views here.
 
 def home(request):
@@ -167,3 +171,12 @@ def posts_by_tag(request, tag_name):
     }
 
     return render(request, 'blog/posts_by_tag.html', context)
+
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        tag = Tag.objects.get(slug=self.kwargs.get('tag_slug'))
+        return Post.objects.filter(tags=tag)
