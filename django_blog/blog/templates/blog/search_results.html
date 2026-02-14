@@ -1,0 +1,23 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+<h2>Search Results</h2>
+
+{% if query %}
+    <p>Results for: "<strong>{{ query }}</strong>"</p>
+{% endif %}
+
+{% if results %}
+    {% for post in results %}
+        <h3>
+            <a href="{% url 'post-detail' post.pk %}">
+                {{ post.title }}
+            </a>
+        </h3>
+        <p>{{ post.content|truncatewords:20 }}</p>
+    {% endfor %}
+{% else %}
+    <p>No results found.</p>
+{% endif %}
+
+{% endblock %}

@@ -664,3 +664,139 @@ To test the comment system:
 
    * You cannot edit or delete someone else's comment.
 
+
+
+# Tagging and Search Functionality
+
+## Overview
+
+The blog application includes a tagging system and a search feature to improve content organization and discoverability.
+
+Users can:
+
+* Assign multiple tags to blog posts
+* Filter posts by clicking on tags
+* Search posts by title, content, or tags
+
+These features enhance navigation and allow users to quickly find relevant content.
+
+---
+
+# Tagging System
+
+## Tag Model
+
+A `Tag` model is implemented with a many-to-many relationship to the `Post` model.
+
+Each post can have multiple tags, and each tag can be associated with multiple posts.
+
+---
+
+## Adding Tags to a Post
+
+When creating or editing a post:
+
+1. Navigate to `/posts/new/` or edit an existing post.
+2. In the tags field, enter tag names separated by commas.
+
+Example:
+
+```
+django, python, backend
+```
+
+The system will:
+
+* Automatically create new tags if they do not exist.
+* Associate existing tags if they already exist.
+* Remove old tags when editing a post.
+
+---
+
+## Viewing Tags
+
+Tags are displayed:
+
+* On the post detail page
+* On the post list page
+
+Each tag is clickable.
+
+Clicking a tag redirects to:
+
+```
+/tags/<tag_name>/
+```
+
+This page displays all posts associated with that tag.
+
+---
+
+# Search Functionality
+
+## Search Behavior
+
+The search feature allows users to search posts based on:
+
+* Post title
+* Post content
+* Tag names
+
+Search is case-insensitive.
+
+---
+
+## How to Use Search
+
+1. Use the search bar located in the navigation section.
+2. Enter a keyword.
+3. Press the search button.
+
+The search query is sent to:
+
+```
+/search/?q=<keyword>
+```
+
+---
+
+## Search Results Page
+
+The results page displays:
+
+* Matching posts
+* A preview of the content
+* A link to the full post
+
+If no results are found, a message is displayed.
+
+---
+
+# Technical Implementation Details
+
+* `ManyToManyField` is used to associate tags with posts.
+* `Q` objects are used in the search view to allow multi-field filtering.
+* `.distinct()` ensures no duplicate posts appear when multiple tags match.
+* Tag filtering uses the `related_name` relationship (`tag.posts.all()`).
+
+---
+
+# Permissions and Access
+
+* Any user can view tagged posts.
+* Only authenticated users can create or edit posts.
+* Only post authors can modify or delete their posts.
+* Tags are automatically managed by the system and cannot be modified independently through the user interface.
+
+---
+
+# URL Structure
+
+| Feature           | URL Pattern          |
+| ----------------- | -------------------- |
+| Search            | `/search/?q=keyword` |
+| View posts by tag | `/tags/<tag_name>/`  |
+
+---
+
+This completes the implementation of tagging and search functionality.

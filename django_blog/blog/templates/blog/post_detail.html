@@ -8,6 +8,18 @@
 
 <p><small>By {{ object.author }} on {{ object.published_date }}</small></p>
 
+<p>
+    <strong>Tags:</strong>
+    {% for tag in object.tags.all %}
+        <a href="{% url 'posts-by-tag' tag.name %}">
+            {{ tag.name }}
+        </a>
+    {% empty %}
+        <span>No tags</span>
+    {% endfor %}
+</p>
+
+
 {% if user == object.author %}
     <a href="{% url 'post-update' object.pk %}">Edit</a> |
     <a href="{% url 'post-delete' object.pk %}">Delete</a>
