@@ -247,4 +247,183 @@ Only the author can delete.
 - Nested comments inside PostSerializer
 - Automatic author assignment using perform_create()
 
+
 ---
+
+````markdown
+## Task 2 – User Follows and Feed Functionality
+
+This phase enhances the Social Media API by implementing user follow relationships and a dynamic feed system. Users can now follow and unfollow other users, and retrieve a personalized feed containing posts from the users they follow.
+
+---
+
+### User Model Update
+
+The custom User model includes a self-referencing ManyToMany field:
+
+```python
+following = models.ManyToManyField(
+    "self",
+    symmetrical=False,
+    related_name="followers",
+    blank=True
+)
+````
+
+* `following` represents users that the current user follows.
+* `followers` (via `related_name`) represents users who follow the current user.
+* `symmetrical=False` ensures the relationship is one-directional.
+
+---
+
+## API Endpoints
+
+All endpoints require token authentication.
+
+Include this header in all requests:
+
+```
+Authorization: Token <your_token>
+```
+
+---
+
+### 1. Follow a User
+
+**Endpoint**
+
+```
+POST /api/accounts/follow/<user_id>/
+```
+
+**Description**
+
+Adds the specified user to the authenticated user's following list.
+
+**Example Response**
+
+```json
+{
+  "detail": "You are now following userB."
+}
+```
+
+If the user does not exist:
+
+```json
+{
+  "detail": "User not found."
+}
+```
+
+If attempting to follow yourself:
+
+```json
+{
+  "detail": "You cannot follow yourself."
+}
+```
+
+---
+
+### 2. Unfollow a User
+
+**Endpoint**
+
+```
+POST /api/accounts/unfollow/<user_id>/
+```
+
+**Description**
+
+Removes the specified user from the authenticated user's following list.
+
+**Example Response**
+
+```json
+{
+  "detail": "You have unfollowed userB."
+}
+```
+
+---
+
+### 3. Feed Endpoint
+
+**Endpoint**
+
+```
+GET /api/feed/
+```
+
+**Description**
+
+Returns posts created by users that the authenticated user follows.
+
+* Posts are ordered by newest first.
+* Only accessible to authenticated users.
+
+**Example Response**
+
+```json
+[
+  {
+    "id": 5,
+    "title": "Post from userB",
+    "content": "This should appear in feed.",
+    "author": 8,
+    "created_at": "2026-02-22T14:01:12Z",
+    "updated_at": "2026-02-22T14:01:12Z"
+  }
+]
+```
+
+If the user does not follow anyone:
+
+```json
+[]
+```
+
+---
+
+## Permissions
+
+All follow, unfollow, and feed endpoints require authentication using Django REST Framework token authentication:
+
+```
+Authorization: Token <token>
+```
+
+Unauthenticated requests return:
+
+```
+401 Unauthorized
+```
+
+---
+
+## Testing Procedure
+
+1. Register two users.
+2. Login both users and obtain tokens.
+3. Create posts using the second user.
+4. Follow the second user using the first user.
+5. Retrieve `/api/feed/` using the first user.
+6. Confirm posts appear in the feed.
+7. Unfollow the second user.
+8. Confirm the feed is empty again.
+
+---
+
+## Summary
+
+This implementation introduces:
+
+* Self-referencing follow relationships
+* Secure follow and unfollow endpoints
+* A personalized feed based on followed users
+* Authentication enforcement across all social interactions
+
+The Social Media API now supports core social networking behavior.
+
+```
