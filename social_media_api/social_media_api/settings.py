@@ -184,3 +184,8 @@ X_FRAME_OPTIONS = "DENY"
 SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "False") == "True"
 SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "False") == "True"
 CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", "False") == "True"
+
+
+import os
+
+SECRET_KEY = os.environ.get("SECRET_KEY")
