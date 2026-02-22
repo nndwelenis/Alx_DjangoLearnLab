@@ -54,7 +54,7 @@ class LikePostView(generics.GenericAPIView):
         post = generics.get_object_or_404(Post, pk=pk)
 
         like, created = Like.objects.get_or_create(user=request.user, post=post)
-        
+
         if not created:
             return Response(
                 {"detail": "You already liked this post."},
@@ -93,3 +93,10 @@ class UnlikePostView(generics.GenericAPIView):
         like.delete()
 
         return Response({"detail": "Post unliked."}, status=200)
+    
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+class HealthCheckView(APIView):
+    def get(self, request):
+        return Response({"status": "ok"})
