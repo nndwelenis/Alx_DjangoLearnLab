@@ -7,6 +7,9 @@ from rest_framework.authtoken.models import Token
 
 from rest_framework.permissions import IsAuthenticated
 
+from rest_framework import generics, permissions
+from django.contrib.auth import get_user_model
+
 # Create your views here.
 
 from .serializers import (
@@ -16,6 +19,7 @@ from .serializers import (
 )
 
 User = get_user_model()
+CustomUser = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -51,11 +55,13 @@ class ProfileView(generics.RetrieveAPIView):
 User = get_user_model()
 
 
-class FollowUserView(APIView):
-    permission_classes = [IsAuthenticated]
+class FollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    queryset = CustomUser.objects.all()
 
     def post(self, request, user_id):
-        target_user = User.objects.filter(id=user_id).first()
+        target_user = CustomUser.objects.filter(id=user_id).first()
         if target_user is None:
             return Response({"detail": "User not found."}, status=404)
 
@@ -70,11 +76,13 @@ class FollowUserView(APIView):
         )
 
 
-class UnfollowUserView(APIView):
-    permission_classes = [IsAuthenticated]
+class UnfollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    queryset = CustomUser.objects.all()
 
     def post(self, request, user_id):
-        target_user = User.objects.filter(id=user_id).first()
+        target_user = CustomUser.objects.filter(id=user_id).first()
         if target_user is None:
             return Response({"detail": "User not found."}, status=404)
 
